@@ -45,7 +45,6 @@ const deviceSchema = new Schema<IDevice>(
     },
     mqttTopic: {
       type: String,
-      required: true,
     },
     status: {
       type: String,
@@ -89,9 +88,11 @@ const deviceSchema = new Schema<IDevice>(
   }
 );
 
-// Generate MQTT topic before saving
-deviceSchema.pre('save', function (next) {
-  this.mqttTopic = `iot/${this.userId}/${this._id}`;
+// Generate MQTT topic before validation
+deviceSchema.pre('validate', function (next) {
+  if (!this.mqttTopic) {
+    this.mqttTopic = `iot/${this.userId}/${this._id}`;
+  }
   next();
 });
 
